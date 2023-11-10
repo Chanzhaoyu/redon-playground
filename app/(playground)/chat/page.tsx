@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useRef } from "react";
 import { useChat } from "ai/react";
 import Image from "next/image";
 import clsx from "clsx";
@@ -10,10 +10,14 @@ import "katex/dist/katex.min.css";
 import Tokenizer from "@/components/Tokenizer";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Send, Pause } from "lucide-react";
+import { debounce } from "lodash-es";
 
 export default function SloganGenerator() {
   const { messages, stop, input, isLoading, handleInputChange, handleSubmit } =
     useChat();
+
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const isAI = (role: string) => ["system", "assistant"].includes(role);
 
@@ -26,10 +30,26 @@ export default function SloganGenerator() {
     return <Image width={40} height={40} src="/images/avatar.jpg" alt="User" />;
   };
 
+  const debouncedSmoothScroll = debounce(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, 300);
+
+  useEffect(() => {
+    debouncedSmoothScroll();
+  }, [debouncedSmoothScroll, messages]);
+
+  const onHandleSubmit = (e: any) => {
+    handleSubmit(e);
+  };
+
   return (
-    <div className="w-full h-screen">
+    <div
+      ref={scrollRef}
+      className="w-full h-screen overflow-hidden overflow-y-auto">
       <div className="mx-auto w-full max-w-screen-lg h-full flex flex-col">
-        <div className="flex-1 w-full whitespace-pre-wrap my-4 pt-10">
+        <div className="flex-1 w-full whitespace-pre-wrap my-4 pt-20 pb-20">
           {messages.map((m) => (
             <div
               className={clsx("chat", isAI(m.role) ? "chat-start" : "chat-end")}
@@ -85,13 +105,16 @@ export default function SloganGenerator() {
           {isLoading && (
             <div className="flex items-center justify-center py-4">
               <button className="btn btn-error" onClick={() => stop()}>
+                <Pause />
                 Stop
               </button>
             </div>
           )}
         </div>
-        <div className="w-full pb-8">
-          <form className="flex items-center space-x-4" onSubmit={handleSubmit}>
+        <div className="w-full p-4 fixed left-0 bottom-0 bg-white">
+          <form
+            className="flex items-center space-x-4"
+            onSubmit={onHandleSubmit}>
             <input
               className="input input-bordered w-full "
               value={input}
@@ -99,7 +122,7 @@ export default function SloganGenerator() {
               onChange={handleInputChange}
             />
             <button className="btn" type="submit" disabled={isLoading}>
-              Submit
+              <Send />
             </button>
           </form>
         </div>
