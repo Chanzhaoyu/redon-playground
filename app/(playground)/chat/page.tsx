@@ -7,6 +7,7 @@ import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
+import Tokenizer from "@/components/Tokenizer";
 
 export default function SloganGenerator() {
   const { messages, stop, input, isLoading, handleInputChange, handleSubmit } =
@@ -34,8 +35,11 @@ export default function SloganGenerator() {
               <div className="chat-image avatar">
                 <div className="w-10 rounded-full">{avatar(m.role)}</div>
               </div>
-              <div className="chat-header">
+              <div className="chat-header flex items-center gap-2">
                 {isAI(m.role) ? "Puppy AI" : "You"}
+                <span className="text-xs text-neutral-400">
+                  <Tokenizer text={m.content} />
+                </span>
               </div>
               <div
                 className={clsx(
@@ -49,7 +53,7 @@ export default function SloganGenerator() {
                 </Markdown>
               </div>
               <div className="chat-footer opacity-50">
-                {m?.createdAt?.toLocaleTimeString()}
+                <p>{m?.createdAt?.toLocaleTimeString()}</p>
               </div>
             </div>
           ))}
