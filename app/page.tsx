@@ -14,7 +14,7 @@ export default function Page() {
       <div className="hero-content text-center">
         <div className="max-w-screen-lg">
           <h1 className={clsx("text-5xl font-bold uppercase")}>Playground</h1>
-          <p className="py-6">测试演练场，用于测试各种功能或实验性特性～</p>
+          <p className="py-6">用于测试功能～</p>
           <div className="flex flex-wrap gap-4 justify-center">
             {menus.map((menu) => (
               <Link href={menu.path} key={menu.path}>
