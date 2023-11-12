@@ -10,9 +10,6 @@ npm install pnpm
 
 # install
 pnpm install
-
-# start
-pnpm start
 ```
 
 ## Run
