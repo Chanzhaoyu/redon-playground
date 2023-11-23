@@ -1,13 +1,17 @@
 "use client";
-import React from "react";
+import React, { useCallback } from "react";
 import toast from "react-hot-toast";
+import ImageViewer from "react-simple-image-viewer";
+import Image from "next/image";
 
 interface Image {
-  revised_prompt: string;
+  revised_prompt?: string;
   url: string;
 }
 
 export default function Page() {
+  const [currentImage, setCurrentImage] = React.useState(0);
+  const [isViewerOpen, setIsViewerOpen] = React.useState(false);
   const [prompt, setPrompt] = React.useState("");
   const [images, setImages] = React.useState<Image[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -39,7 +43,7 @@ export default function Page() {
         body: JSON.stringify(params),
       });
       const images = await response.json();
-      console.log(images)
+      console.log(images);
       setPrompt("");
       setImages(images);
     } catch (e) {
@@ -47,6 +51,16 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openImageViewer = useCallback((index: number) => {
+    setCurrentImage(index);
+    setIsViewerOpen(true);
+  }, []);
+
+  const closeImageViewer = () => {
+    setCurrentImage(0);
+    setIsViewerOpen(false);
   };
 
   return (
@@ -115,7 +129,13 @@ export default function Page() {
             className="card card-compact w-96 bg-base-100 shadow-xl"
             key={index}>
             <figure>
-              <img src={image.url} alt={image.revised_prompt } />
+              <Image
+                width={400}
+                height={300}
+                src={image.url}
+                alt={image.revised_prompt ?? ""}
+                onClick={() => openImageViewer(index)}
+              />
             </figure>
             {image.revised_prompt && (
               <div className="card-body">
@@ -125,6 +145,15 @@ export default function Page() {
           </div>
         ))}
       </div>
+      {isViewerOpen && (
+        <ImageViewer
+          src={images.map((image) => image.url)}
+          currentIndex={currentImage}
+          disableScroll={false}
+          closeOnClickOutside={true}
+          onClose={closeImageViewer}
+        />
+      )}
     </div>
   );
 }
