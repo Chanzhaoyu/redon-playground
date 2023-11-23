@@ -23,7 +23,10 @@ export default function Page() {
   const [model, setModel] = React.useState("dall-e-2");
   const [size, setSize] = React.useState("1024x1024");
   const [quality, setQuality] = React.useState("standard");
-  const [n, setN] = React.useState(1);
+  const [n, setN] = React.useState(4);
+
+  const qualityOptions =
+    model === "dall-e-2" ? ["standard", "hd"] : ["standard"];
 
   const handleSubmit = async () => {
     if (loading) return;
@@ -76,8 +79,13 @@ export default function Page() {
   }, [model, n]);
 
   useEffect(() => {
+    // if model is not dall-e-2, set size to 1024x1024
     if (size !== "1024x1024") {
       setSize("1024x1024");
+    }
+    // if quality is not standard, set it to standard
+    if (model === "dall-e-2" && quality !== "standard") {
+      setQuality("standard");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model]);
@@ -108,12 +116,15 @@ export default function Page() {
           value={quality}
           className="select select-bordered w-full max-w-xs"
           onChange={(e) => setQuality(e.target.value)}>
-          <option value="standard">普通</option>
-          <option value="hd">高清</option>
+          {qualityOptions.map((quality) => (
+            <option value={quality} key={quality}>
+              {quality}
+            </option>
+          ))}
         </select>
       </div>
       <div className="flex items-center gap-x-4 my-4">
-        <span>Current count:{n}</span>
+        <span className="-mt-2">{n}</span>
         <div className="flex-1">
           <input
             type="range"
@@ -125,7 +136,7 @@ export default function Page() {
             step="1"
           />
         </div>
-        <span>Model max count: {max}</span>
+        <span className="-mt-2">Max: {max}</span>
       </div>
       <div className="flex items-center space-x-4 mb-4">
         <input
@@ -140,7 +151,11 @@ export default function Page() {
           className="btn"
           disabled={loading}
           onClick={() => handleSubmit()}>
-          {loading ? <span className="loading loading-spinner"></span> : "提交"}
+          {loading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            "Generate"
+          )}
         </button>
       </div>
       <div className="grid grid-cols-2 gap-4">
