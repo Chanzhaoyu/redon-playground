@@ -103,6 +103,26 @@ export default function Page() {
 
   const sizeOptions = model === "dall-e-2" ? dall2Options : dall3Options;
 
+  const onClearAll = () => {
+    const flag = window.confirm("Are you sure to clear all images?");
+    if (flag) {
+      setImageLocale([]);
+      setImages([]);
+      toast.success("Clear all images successfully");
+    }
+  };
+
+  const onDelete = (index: number) => {
+    const flag = window.confirm("Are you sure to delete this image?");
+    if (flag) {
+      const newImages = [...images];
+      newImages.splice(index, 1);
+      setImageLocale(newImages);
+      setImages(newImages);
+      toast.success("Delete image successfully");
+    }
+  };
+
   return (
     <div className="max-w-screen-lg m-auto py-10">
       <div className="mb-4 grid grid-cols-4 gap-4">
@@ -169,27 +189,48 @@ export default function Page() {
           )}
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        {images.map((image, index) => (
-          <div
-            className="card card-compact w-96 bg-base-100 shadow-xl"
-            key={index}>
-            <figure>
-              <Image
-                width={400}
-                height={300}
-                src={image.url}
-                alt={image.revised_prompt ?? ""}
-                onClick={() => openImageViewer(index)}
-              />
-            </figure>
-            {image.revised_prompt && (
-              <div className="card-body">
-                <p>{image.revised_prompt}</p>
-              </div>
-            )}
+
+      <div>
+        {images.length > 0 ? (
+          <>
+            <div className="flex items-center gap-4 my-4">
+              <button className="btn btn-error" onClick={onClearAll}>
+                Clear All
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-hidden overflow-y-auto">
+              {images.map((image, index) => (
+                <div
+                  className="card card-compact w-96 bg-base-100 shadow-xl"
+                  key={index}>
+                  <figure>
+                    <Image
+                      width={400}
+                      height={300}
+                      src={image.url}
+                      alt={image.revised_prompt ?? ""}
+                      onClick={() => openImageViewer(index)}
+                    />
+                  </figure>
+                  {image.revised_prompt && (
+                    <div className="card-body">
+                      <p>{image.revised_prompt}</p>
+                    </div>
+                  )}
+                  <button
+                    className="btn btn-error mt-2"
+                    onClick={() => onDelete(index)}>
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center">
+            <p className="text-2xl font-bold">No images</p>
           </div>
-        ))}
+        )}
       </div>
       {isViewerOpen && (
         <ImageViewer
