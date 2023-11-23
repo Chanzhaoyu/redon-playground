@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageViewer from "react-simple-image-viewer";
 import Image from "next/image";
@@ -8,6 +8,10 @@ interface Image {
   revised_prompt?: string;
   url: string;
 }
+
+const dall2Options = ["256x256", "512x512", "1024x1024"];
+
+const dall3Options = ["1024x1024", "1024x1792", "1792x1024"];
 
 export default function Page() {
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -63,6 +67,23 @@ export default function Page() {
     setIsViewerOpen(false);
   };
 
+  const max = model === "dall-e-2" ? 10 : 1;
+
+  useEffect(() => {
+    if (model === "dall-e-3" && n > 1) {
+      setN(1);
+    }
+  }, [model, n]);
+
+  useEffect(() => {
+    if (size !== "1024x1024") {
+      setSize("1024x1024");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [model]);
+
+  const sizeOptions = model === "dall-e-2" ? dall2Options : dall3Options;
+
   return (
     <div className="max-w-screen-lg m-auto py-10">
       <div className="mb-4 grid grid-cols-4 gap-4">
@@ -77,9 +98,11 @@ export default function Page() {
           value={size}
           className="select select-bordered w-full max-w-xs"
           onChange={(e) => setSize(e.target.value)}>
-          <option value="1024x1024">1024x1024</option>
-          <option value="1024x1792">1024x1792</option>
-          <option value="1792x1024">1792x1024</option>
+          {sizeOptions.map((size) => (
+            <option value={size} key={size}>
+              {size}
+            </option>
+          ))}
         </select>
         <select
           value={quality}
@@ -88,24 +111,21 @@ export default function Page() {
           <option value="standard">普通</option>
           <option value="hd">高清</option>
         </select>
-        <div>
+      </div>
+      <div className="flex items-center gap-x-4 my-4">
+        <span>Current count:{n}</span>
+        <div className="flex-1">
           <input
             type="range"
-            min={0}
-            max="4"
+            min={1}
+            max={max}
             value={n}
             onChange={(e) => setN(+e.target.value)}
             className="range"
             step="1"
           />
-          <div className="w-full flex justify-between text-xs px-2">
-            <span>|</span>
-            <span>|</span>
-            <span>|</span>
-            <span>|</span>
-            <span>|</span>
-          </div>
         </div>
+        <span>Model max count: {max}</span>
       </div>
       <div className="flex items-center space-x-4 mb-4">
         <input
