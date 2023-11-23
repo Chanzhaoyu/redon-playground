@@ -3,6 +3,7 @@ import React, { useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageViewer from "react-simple-image-viewer";
 import Image from "next/image";
+import { getImageLocale, setImageLocale } from "@/utils/imageLocale";
 
 interface Image {
   revised_prompt?: string;
@@ -13,11 +14,13 @@ const dall2Options = ["256x256", "512x512", "1024x1024"];
 
 const dall3Options = ["1024x1024", "1024x1792", "1792x1024"];
 
+const list = getImageLocale();
+
 export default function Page() {
   const [currentImage, setCurrentImage] = React.useState(0);
   const [isViewerOpen, setIsViewerOpen] = React.useState(false);
   const [prompt, setPrompt] = React.useState("");
-  const [images, setImages] = React.useState<Image[]>([]);
+  const [images, setImages] = React.useState<Image[]>(list ?? []);
   const [loading, setLoading] = React.useState(false);
 
   const [model, setModel] = React.useState("dall-e-2");
@@ -50,9 +53,8 @@ export default function Page() {
         body: JSON.stringify(params),
       });
       const images = await response.json();
-      console.log(images);
+      saveImageToLocale(images);
       setPrompt("");
-      setImages(images);
     } catch (e) {
       console.log(e);
     } finally {
@@ -68,6 +70,15 @@ export default function Page() {
   const closeImageViewer = () => {
     setCurrentImage(0);
     setIsViewerOpen(false);
+  };
+
+  const saveImageToLocale = (images: any[]) => {
+    setImages((prev) => {
+      const newImages = [...images, ...prev];
+      setImageLocale(images);
+      setImageLocale(newImages);
+      return newImages;
+    });
   };
 
   const max = model === "dall-e-2" ? 10 : 1;
