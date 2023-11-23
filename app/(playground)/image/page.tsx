@@ -39,6 +39,7 @@ export default function Page() {
         body: JSON.stringify(params),
       });
       const images = await response.json();
+      console.log(images)
       setPrompt("");
       setImages(images);
     } catch (e) {
@@ -56,7 +57,7 @@ export default function Page() {
           className="select select-bordered w-full max-w-xs"
           onChange={(e) => setModel(e.target.value)}>
           <option value="dall-e-2">DALL-E-2</option>
-          <option value="dall-3-3">DALL-E-3</option>
+          <option value="dall-e-3">DALL-E-3</option>
         </select>
         <select
           value={size}
@@ -114,7 +115,7 @@ export default function Page() {
             className="card card-compact w-96 bg-base-100 shadow-xl"
             key={index}>
             <figure>
-              <img src={image.url} alt={image.revised_prompt} />
+              <img src={image.url} alt={image.revised_prompt } />
             </figure>
             {image.revised_prompt && (
               <div className="card-body">
