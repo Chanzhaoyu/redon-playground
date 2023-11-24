@@ -8,6 +8,7 @@ export default function Page() {
     { name: "Image", path: "/image" },
     { name: "Text to speech", path: "/text-to-speech" },
     { name: "Speech to text", path: "/speech-to-text" },
+    { name: "Tailwindcss", path: "/tailwindcss" },
   ];
   return (
     <div className="hero min-h-screen bg-base-200">
@@ -18,7 +19,7 @@ export default function Page() {
           <div className="flex flex-wrap gap-4 justify-center">
             {menus.map((menu) => (
               <Link href={menu.path} key={menu.path}>
-                <button className="btn btn-primary">{menu.name}</button>
+                <button className="btn">{menu.name}</button>
               </Link>
             ))}
           </div>

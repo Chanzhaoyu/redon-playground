@@ -5,6 +5,7 @@
     "katex",
     "openai",
     "rehype",
+    "Tailwindcss",
     "webm"
   ]
 }
